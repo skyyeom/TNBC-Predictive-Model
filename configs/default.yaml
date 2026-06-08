@@ -1,0 +1,46 @@
+project: tnbc_pcr_multimodal_model
+random_state: 42
+paths:
+  processed_table: data/processed/synthetic_tnbc_multimodal.csv
+  output_dir: outputs
+outcome: pcr
+id_column: patient_id
+subtype_filter:
+  require_tnbc: true
+feature_groups:
+  clinical:
+    - age
+    - tumor_size_cm
+    - node_positive
+    - grade
+    - er_negative
+    - pr_negative
+    - her2_negative
+  mri_longitudinal:
+    - mri_ld_baseline
+    - mri_ld_early_ac
+    - mri_ld_interreg
+    - mri_ld_presurg
+    - mri_ld_delta_t1_t2
+    - mri_ld_delta_t1_t3
+    - mri_ld_delta_t1_t4
+  imaging_deep:
+    prefix: deep_mri_
+  radiomics:
+    prefix: rad_
+  omics_optional:
+    - tp53_mut
+    - pik3ca_mut
+    - hrd_score
+    - tmb
+selection:
+  univariable_p_threshold: 0.20
+  correlation_threshold: 0.85
+model:
+  ensemble:
+    - logistic_regression_elasticnet
+    - support_vector_machine
+    - random_forest
+validation:
+  test_size: 0.25
+  cv_folds: 5

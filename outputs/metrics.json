@@ -1,0 +1,35 @@
+{
+  "n_total_tnbc":240,
+  "n_train":180,
+  "n_test":60,
+  "auc":0.71875,
+  "accuracy":0.7,
+  "univariable_selected":[
+    "tumor_size_cm",
+    "node_positive",
+    "mri_ld_presurg",
+    "mri_ld_delta_t1_t2",
+    "mri_ld_delta_t1_t3",
+    "mri_ld_delta_t1_t4",
+    "pik3ca_mut",
+    "hrd_score",
+    "rad_glcm_contrast",
+    "deep_mri_00",
+    "deep_mri_01",
+    "deep_mri_04"
+  ],
+  "final_features":[
+    "tumor_size_cm",
+    "node_positive",
+    "mri_ld_presurg",
+    "mri_ld_delta_t1_t2",
+    "mri_ld_delta_t1_t3",
+    "mri_ld_delta_t1_t4",
+    "pik3ca_mut",
+    "hrd_score",
+    "rad_glcm_contrast",
+    "deep_mri_00",
+    "deep_mri_01",
+    "deep_mri_04"
+  ]
+}

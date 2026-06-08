@@ -1,0 +1,14 @@
+numpy
+pandas
+scikit-learn
+scipy
+pyyaml
+joblib
+matplotlib
+# Optional for real MRI experiments:
+# torch
+# monai
+# nibabel
+# pydicom
+# SimpleITK
+# pyradiomics

@@ -1,0 +1,8 @@
+model,data_used,n_test,auc,accuracy,n_selected_features,selected_features
+Clinical only,synthetic demo,60,0.5362,0.6667,2,node_positive; grade
+MRI only,synthetic demo,60,0.58,0.6333,6,mri_ld_presurg; mri_ld_delta_t1_t2; mri_ld_delta_t1_t3; mri_ld_delta_t1_t4; rad_glcm_contrast; deep_mri_01
+Clinical + MRI longest diameter,synthetic demo,60,0.5213,0.6167,6,node_positive; grade; mri_ld_presurg; mri_ld_delta_t1_t2; mri_ld_delta_t1_t3; mri_ld_delta_t1_t4
+Clinical + radiomics,synthetic demo,60,0.5813,0.6333,7,node_positive; grade; mri_ld_presurg; mri_ld_delta_t1_t2; mri_ld_delta_t1_t3; mri_ld_delta_t1_t4; rad_glcm_contrast
+Clinical + deep MRI,synthetic demo,60,0.5425,0.6667,7,node_positive; grade; mri_ld_presurg; mri_ld_delta_t1_t2; mri_ld_delta_t1_t3; mri_ld_delta_t1_t4; deep_mri_01
+Clinical + MRI + omics,synthetic demo,60,0.645,0.6667,10,node_positive; grade; mri_ld_presurg; mri_ld_delta_t1_t2; mri_ld_delta_t1_t3; mri_ld_delta_t1_t4; rad_glcm_contrast; deep_mri_01; pik3ca_mut; hrd_score
+Full multimodal ensemble,synthetic demo,60,0.645,0.6667,10,node_positive; grade; mri_ld_presurg; mri_ld_delta_t1_t2; mri_ld_delta_t1_t3; mri_ld_delta_t1_t4; rad_glcm_contrast; deep_mri_01; pik3ca_mut; hrd_score
