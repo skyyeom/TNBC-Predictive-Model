@@ -42,11 +42,13 @@ def make_rf(random_state: int = 42) -> Pipeline:
 @dataclass
 class UnweightedPCRensemble(BaseEstimator, ClassifierMixin):
     random_state: int = 42
+    _estimator_type: str = "classifier"
 
     def __post_init__(self):
         self.models_ = [make_lr(self.random_state), make_svm(self.random_state), make_rf(self.random_state)]
 
     def fit(self, X, y):
+        self.classes_ = np.array([0, 1])
         self.models_ = [make_lr(self.random_state), make_svm(self.random_state), make_rf(self.random_state)]
         for model in self.models_:
             model.fit(X, y)
