@@ -1,0 +1,27 @@
+datasets:
+  ispy1:
+    role: train_or_external_validation
+    modality: DCE-MRI longitudinal
+    timepoints: [T1_baseline, T2_early_AC, T3_inter_regimen, T4_pre_surgery]
+    target: pCR
+    notes: Main longitudinal MRI template for timepoint harmonization.
+  acrin6698:
+    role: external_validation_or_dwi_feature_source
+    modality: DWI/ADC MRI
+    target: pCR when linked to I-SPY2 clinical outcomes
+    notes: Adds diffusion biomarkers and functional MRI response features.
+  ispy2:
+    role: primary_training
+    modality: DCE-MRI multi-center
+    target: pCR
+    notes: Main modern neoadjuvant therapy cohort.
+  duke_breast_cancer_mri:
+    role: imaging_pretraining_and_segmentation
+    modality: DCE-MRI
+    target: not_primary_pcr
+    notes: Useful for tumor localization, radiomics, and representation pretraining.
+  cbis_ddsm:
+    role: auxiliary_pretraining
+    modality: mammography
+    target: lesion_benign_malignant_or_pathology
+    notes: Not direct pCR prediction; use only for auxiliary lesion representation learning.
