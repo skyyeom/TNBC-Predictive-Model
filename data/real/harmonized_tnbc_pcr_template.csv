@@ -1,0 +1,2 @@
+patient_id,dataset,pcr,er_status,pr_status,her2_status,clinical_age,clinical_tumor_size_mm,clinical_node_positive,treatment_carbo,mri_t1_longest_diameter_mm,mri_t2_longest_diameter_mm,mri_t3_longest_diameter_mm,mri_t4_longest_diameter_mm,radiomics_shape_volume,radiomics_glcm_entropy,deep_mri_embedding_001,deep_mri_embedding_002,omics_hrd_score,omics_tp53_mutated
+P001,ISPY1,1,negative,negative,negative,47,38,1,0,40,31,22,8,12.5,4.1,0.23,-0.15,62,1

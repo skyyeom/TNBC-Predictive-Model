@@ -233,63 +233,85 @@ Output: pCR
 Purpose: closest extension of the attached multi-omic paper.
 
 
-## Results Included in This Repository
+## Real-Data Results Pipeline
 
-The current package includes **synthetic demo results only**. These results verify that the full pipeline runs end-to-end, but they should not be interpreted as clinical performance. Real results require approved access to I-SPY1, I-SPY2, ACRIN 6698, Duke MRI, and any matched clinical labels, followed by patient-level harmonization and external validation.
+This version removes synthetic values from the main results section. The repository now contains an executable real-data pipeline that generates the requested outputs after the approved public cohort files are downloaded and harmonized locally.
 
-### Synthetic End-to-End Demo Result
+Real results are not pre-filled because the package does not redistribute protected clinical-trial MRI data or patient-level labels. Once `data/real/harmonized_tnbc_pcr.csv` is created, the command below generates the actual results from I-SPY1, I-SPY2, ACRIN6698, and Duke-derived features.
 
-| Metric | Value |
-|---|---:|
-| Synthetic TNBC patients | 240 |
-| Train size | 180 |
-| Test size | 60 |
-| AUC | 0.7188 |
-| Accuracy | 0.7000 |
-| Final selected features | 12 |
-
-Selected features in the end-to-end demo:
-
-```text
-- tumor_size_cm
-- node_positive
-- mri_ld_presurg
-- mri_ld_delta_t1_t2
-- mri_ld_delta_t1_t3
-- mri_ld_delta_t1_t4
-- pik3ca_mut
-- hrd_score
-- rad_glcm_contrast
-- deep_mri_00
-- deep_mri_01
-- deep_mri_04
+```bash
+python scripts/run_real_multicohort_pipeline.py \
+  --table data/real/harmonized_tnbc_pcr.csv \
+  --train-datasets ISPY1 ISPY2 \
+  --external-datasets ACRIN6698 DUKE
 ```
 
-### Synthetic Ablation Study
+The script produces:
 
-The ablation table shows how the README should report future real-data experiments. At this stage, every value below is generated from the synthetic dataset in `data/processed/synthetic_tnbc_multimodal.csv`.
+| Output | File |
+|---|---|
+| ROC curve | `outputs/real/roc_curve.png` |
+| Precision-recall curve | `outputs/real/precision_recall_curve.png` |
+| Confusion matrix | `outputs/real/confusion_matrix.png` |
+| AUC, PR-AUC, accuracy, sensitivity, specificity, F1 | `outputs/real/real_metrics.json` |
+| Feature-importance table | `outputs/real/feature_importance.csv` |
+| Feature-importance plot | `outputs/real/feature_importance.png` |
+| Ablation study | `outputs/real/real_ablation_results.csv` |
+| Saved pCR ensemble | `outputs/real/real_pcr_ensemble.joblib` |
 
-| model                           | data_used      |   n_test |    auc |   accuracy |   n_selected_features |
-|:--------------------------------|:---------------|---------:|-------:|-----------:|----------------------:|
-| Clinical only                   | synthetic demo |       60 | 0.5362 |     0.6667 |                     2 |
-| MRI only                        | synthetic demo |       60 | 0.58   |     0.6333 |                     6 |
-| Clinical + MRI longest diameter | synthetic demo |       60 | 0.5213 |     0.6167 |                     6 |
-| Clinical + radiomics            | synthetic demo |       60 | 0.5813 |     0.6333 |                     7 |
-| Clinical + deep MRI             | synthetic demo |       60 | 0.5425 |     0.6667 |                     7 |
-| Clinical + MRI + omics          | synthetic demo |       60 | 0.645  |     0.6667 |                    10 |
-| Full multimodal ensemble        | synthetic demo |       60 | 0.645  |     0.6667 |                    10 |
+### Required Real Data Table
 
-### Real-Dataset Results Table Template
+Create this file:
 
-Use this table after real public datasets are downloaded and harmonized. Keep synthetic and real results separate.
+```text
+data/real/harmonized_tnbc_pcr.csv
+```
 
-| Dataset Split | Training Dataset | Validation Dataset | Model | Data Used | AUC | Accuracy | Notes |
-|---|---|---|---|---|---:|---:|---|
-| Internal demo | Synthetic TNBC | Synthetic holdout | Full ensemble | Clinical + MRI + omics | 0.7188 | 0.7000 | Synthetic only |
-| External validation 1 | I-SPY2 | I-SPY1 | Full ensemble | Clinical + temporal MRI | TBD | TBD | Requires clinical label harmonization |
-| External validation 2 | I-SPY1 + I-SPY2 | ACRIN 6698 | Full ensemble | Clinical + DCE/DWI MRI | TBD | TBD | Functional MRI validation |
-| Transfer learning | Duke pretraining | I-SPY holdout | MRI encoder + ensemble | MRI + clinical | TBD | TBD | Tests MRI representation transfer |
-| Auxiliary pretraining | CBIS-DDSM pretraining | I-SPY2 | Imaging encoder + ensemble | Mammography pretraining to MRI fine-tuning | TBD | TBD | Exploratory only |
+A template is included at:
+
+```text
+data/real/harmonized_tnbc_pcr_template.csv
+```
+
+Required columns:
+
+| Column | Meaning |
+|---|---|
+| `patient_id` | De-identified patient ID |
+| `dataset` | `ISPY1`, `ISPY2`, `ACRIN6698`, or `DUKE` |
+| `pcr` | 1 for pCR, 0 for residual disease |
+| `er_status` | ER status for TNBC filtering |
+| `pr_status` | PR status for TNBC filtering |
+| `her2_status` | HER2 status for TNBC filtering |
+
+Numeric feature columns should use these prefixes:
+
+```text
+clinical_*
+treatment_*
+mri_*
+delta_*
+radiomics_*
+deep_*
+omics_*
+```
+
+### Real Evaluation Design
+
+| Experiment | Training Dataset | External Validation Dataset | Model | Results Generated |
+|---|---|---|---|---|
+| Clinical baseline | I-SPY1 + I-SPY2 TNBC | ACRIN6698 / Duke-derived validation table | Elastic-net LR + SVM + RF ensemble | AUC, PR-AUC, confusion matrix |
+| MRI-only model | I-SPY1 + I-SPY2 TNBC | ACRIN6698 / Duke-derived validation table | MRI/radiomics/deep-feature ensemble | AUC, feature importance |
+| Clinical + MRI | I-SPY1 + I-SPY2 TNBC | ACRIN6698 / Duke-derived validation table | Multimodal ensemble | ROC, PR, confusion matrix |
+| Clinical + MRI + Omics | I-SPY1 + I-SPY2 TNBC | ACRIN6698 / Duke-derived validation table | Full Sammut-style integrated model | Final ablation row |
+
+### Reporting Rule
+
+Do not report AUC values in the README until the real command has been run on the downloaded datasets. After running the command, copy the contents of `outputs/real/real_metrics.json` and `outputs/real/real_ablation_results.csv` into this section.
+
+### Synthetic Demo Status
+
+Synthetic demo files remain in `data/processed/` and `outputs/` only as unit-test artifacts. They verify code execution, but they are no longer presented as research results.
 
 ## MRI Preprocessing and Fusion Diagram
 
@@ -338,7 +360,9 @@ tnbc_pcr_multimodal_model/
 │   └── figures/mri_multimodal_pipeline.png
 ├── scripts/
 │   ├── make_synthetic_demo.py
-│   └── run_ablation_demo.py
+│   ├── run_ablation_demo.py
+│   ├── run_real_multicohort_pipeline.py
+│   └── export_mri_attention_maps.py
 ├── src/
 │   ├── data_schema.py
 │   ├── dataset_harmonization.py
@@ -349,12 +373,31 @@ tnbc_pcr_multimodal_model/
 │   ├── segmentation_distillation.py
 │   ├── multimodal_fusion.py
 │   ├── modeling.py
+│   ├── evaluation_plots.py
+│   ├── mri_attention_maps.py
 │   ├── train.py
 │   └── evaluate.py
 ├── tests/
 │   └── test_pipeline.py
-└── outputs/
+├── data/real/
+│   ├── README.md
+│   └── harmonized_tnbc_pcr_template.csv
+└── outputs/real/
 ```
+
+## How to Run the Real Multicohort Pipeline
+
+After downloading and harmonizing I-SPY1, I-SPY2, ACRIN6698, and Duke-derived MRI features, run:
+
+```bash
+pip install -r requirements.txt
+python scripts/run_real_multicohort_pipeline.py \
+  --table data/real/harmonized_tnbc_pcr.csv \
+  --train-datasets ISPY1 ISPY2 \
+  --external-datasets ACRIN6698 DUKE
+```
+
+This generates the requested ROC curves, confusion matrix, AUC values, feature-importance plots, and ablation study under `outputs/real/`. MRI attention maps require a trained deep MRI encoder and raw image tensors; the scaffolding for the imaging branch is included, but attention maps should only be exported after real MRI model training.
 
 ## How to Run the Synthetic Demo
 
